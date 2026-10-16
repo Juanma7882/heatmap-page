@@ -1,0 +1,539 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Interview Landing Prototype</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;700&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: single-column product page; a fixed "tracking layer" drawer on the right overlays click/scroll heatmaps and analytics for the reviewer. */
+:root{
+  --bg:#f4f6fa; --surface:#ffffff; --ink:#152038; --muted:#5a6479; --line:#dbe1ec;
+  --accent:#f0b429; --accent-ink:#2a1d00; --brand:#1f3a68; --good:#1e7a4f; --bad:#b4372f;
+  --code-bg:#0f1729; --code-fg:#d5def0; --code-line:#26324d; --code-dim:#8c9ab6; --code-hi:#f5c451;
+  --display:"Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --body:"Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0d1424; --surface:#151f35; --ink:#e8edf7; --muted:#9aa6bd; --line:#26334f;
+  --accent:#f5c451; --accent-ink:#231800; --brand:#8fb1ea; --good:#5cc79a; --bad:#ef7d74;
+  --code-bg:#070c18; --code-fg:#cfd9ee; --code-line:#1f2a42; --code-dim:#8794ad; --code-hi:#f5c451; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1424; --surface:#151f35; --ink:#e8edf7; --muted:#9aa6bd; --line:#26334f;
+  --accent:#f5c451; --accent-ink:#231800; --brand:#8fb1ea; --good:#5cc79a; --bad:#ef7d74;
+  --code-bg:#070c18; --code-fg:#cfd9ee; --code-line:#1f2a42; --code-dim:#8794ad; --code-hi:#f5c451; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{overflow-x:hidden}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;position:relative}
+.wrap{max-width:980px;margin:0 auto;padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);line-height:1.1;text-wrap:balance;margin:0}
+p{margin:0}
+.proto{background:var(--brand);color:var(--bg)}
+.proto .wrap{padding-block:8px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between;font-size:13px}
+.proto button{font:700 13px var(--body);background:var(--accent);color:var(--accent-ink);border:0;border-radius:6px;padding:7px 12px;cursor:pointer}
+header.hero .wrap{padding-block:56px 40px;display:grid;gap:20px}
+.eyebrow{font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--brand)}
+.hero h1{font-size:clamp(2.1rem,5.5vw,3.6rem);max-width:16ch}
+.hero h1 em{font-style:normal;color:var(--brand);text-decoration:underline;text-decoration-color:var(--accent);text-decoration-thickness:.09em;text-underline-offset:.14em;text-decoration-skip-ink:none}
+.hero p.lead{font-size:1.15rem;color:var(--muted);max-width:56ch}
+.ctas{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.btn{font:700 16px var(--body);border-radius:10px;padding:13px 20px;cursor:pointer;border:2px solid var(--ink);background:var(--ink);color:var(--bg);text-decoration:none;display:inline-block}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.price{font-size:14px;color:var(--muted)}
+.price b{color:var(--ink)}
+.tag{display:inline-block;font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line);border-radius:4px;padding:1px 6px;color:var(--muted);vertical-align:middle;margin-left:6px}
+section .wrap{padding-block:44px}
+.sec-line{border-top:1px solid var(--line)}
+h2{font-size:clamp(1.6rem,3.5vw,2.2rem);margin-bottom:10px}
+.sub{color:var(--muted);max-width:60ch;margin-bottom:24px}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px}
+.steps>div{display:grid;gap:6px;align-content:start}
+.steps .n{font:600 13px var(--mono);color:var(--brand)}
+.steps h3{font-size:1.15rem}
+.steps p{color:var(--muted);font-size:15px}
+.check{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:24px;display:grid;gap:18px;max-width:640px}
+.progress{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+.q{font:700 1.2rem var(--display)}
+.qctx{color:var(--muted);font-size:14px}
+.opts{display:grid;gap:10px}
+.opt{text-align:left;font:16px var(--body);padding:13px 15px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--brand)}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 12%,var(--bg))}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 10%,var(--bg))}
+.fb{font-size:15px;min-height:1.5em}
+.result{display:grid;gap:12px}
+.score{font:700 3rem var(--display);font-variant-numeric:tabular-nums}
+form.book{display:grid;gap:14px;max-width:640px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:24px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:560px){.row{grid-template-columns:1fr}}
+label{display:grid;gap:6px;font-size:14px;font-weight:700}
+input,select{font:16px var(--body);padding:11px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);width:100%}
+form.book .btn{justify-self:start}
+.note{font-size:13px;color:var(--muted)}
+.err{font-size:14px;color:var(--bad)}
+.ok{border-left:4px solid var(--good);padding:10px 14px;background:color-mix(in srgb,var(--good) 10%,var(--surface));border-radius:6px}
+footer .wrap{padding-block:28px;font-size:13px;color:var(--muted);border-top:1px solid var(--line)}
+
+/* tracking layer */
+#heat{position:absolute;left:0;top:0;pointer-events:none;z-index:5;opacity:.85}
+.panel{position:fixed;right:0;top:0;bottom:0;width:min(400px,100%);background:var(--code-bg);color:var(--code-fg);z-index:20;overflow-y:auto;overscroll-behavior:contain;font-family:var(--mono);font-size:12.5px;box-shadow:-8px 0 30px rgba(0,0,0,.25);
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);padding-right:env(safe-area-inset-right,0px)}
+.panel>div,.panel>h3{padding:12px 16px;border-bottom:1px solid var(--code-line)}
+.panel h3{font-family:var(--mono);font-size:13px;letter-spacing:.06em;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--code-bg);z-index:1}
+.panel h4{margin:0 0 8px;font:600 11.5px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--code-dim)}
+.panel button{font:600 12px var(--mono);background:var(--code-line);color:var(--code-fg);border:0;border-radius:5px;padding:6px 9px;cursor:pointer}
+.panel button.on{background:var(--accent);color:var(--accent-ink)}
+.btnrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.funnel,.bars{display:grid;gap:5px}
+.funnel div,.bars div{display:grid;grid-template-columns:118px 1fr 44px;gap:8px;align-items:center;font-variant-numeric:tabular-nums}
+.bars div{grid-template-columns:132px 1fr 44px}
+.bar{height:8px;background:var(--code-line);border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent)}
+.num{text-align:right}
+table.top{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+table.top th{font-weight:600;color:var(--code-dim);text-align:left;padding:3px 0;border-bottom:1px solid var(--code-line)}
+table.top td{padding:4px 0;border-bottom:1px dashed var(--code-line);vertical-align:top}
+table.top td.n,table.top th.n{text-align:right;padding-left:8px}
+.flag{display:inline-block;font-size:10.5px;border-radius:3px;padding:0 4px;margin-left:4px}
+.flag.dead{background:#5b2a2a;color:#ffd3cf}
+.flag.rage{background:#6b3d00;color:#ffe1a8}
+.insights{display:grid;gap:8px;margin:0;padding-left:18px}
+.insights li{line-height:1.5}
+.legend{display:flex;align-items:center;gap:8px;margin-top:8px;color:var(--code-dim);font-size:11px}
+.legend span.ramp{flex:1;height:8px;border-radius:4px;background:linear-gradient(90deg,#2b6cff,#22c6a3,#ffd23f,#ff5a36)}
+.log{max-height:220px;overflow:auto}
+.log p{padding:3px 0;border-bottom:1px dashed var(--code-line);word-break:break-word}
+.log b{color:var(--code-hi);font-weight:600}
+.small{font-size:11.5px;color:var(--code-dim);line-height:1.5}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<canvas id="heat" aria-hidden="true"></canvas>
+
+<div class="proto">
+  <div class="wrap">
+    <span><b>Prototype</b> · landing concept for easypeasy (/interview) by Juan Fernández · not a live page, nothing is sent</span>
+    <button type="button" id="openPanel" data-hm="Tracking button">Show tracking layer</button>
+  </div>
+</div>
+
+<main id="page">
+<header class="hero" id="hero" data-sec="Hero">
+  <div class="wrap">
+    <span class="eyebrow">Inglés para entrevistas · Buenos Aires</span>
+    <h1 data-hm="Headline">Llegá a tu entrevista en inglés <em>hablando</em>, no traduciendo.</h1>
+    <p class="lead" data-hm="Intro text">Entendés inglés, pero cuando tenés que hablar te trabás. Practicás uno a uno con un profesor nativo que prepara con vos la conversación que te importa, y ves tu progreso cada semana.</p>
+    <div class="ctas">
+      <a class="btn" href="#check" data-hm="CTA: take the test" data-ev="cta_check_clicked">Hacer el test de 2 minutos</a>
+      <a class="btn ghost" href="#book" data-hm="CTA: book trial" data-ev="cta_trial_clicked">Reservar clase de prueba gratis</a>
+    </div>
+    <p class="price" id="priceLine" data-hm="Price line"></p>
+  </div>
+</header>
+
+<section id="how" data-sec="How it works">
+  <div class="wrap sec-line">
+    <h2>Cómo funciona</h2>
+    <p class="sub">Tres pasos, sin contrato anual.</p>
+    <div class="steps">
+      <div data-hm="Step 1: test"><span class="n">Paso 1 · Test</span><h3>Medimos tu speaking</h3><p>Un test corto con frases de entrevista. En el producto real grabás tu voz y lo revisa un profesor.</p></div>
+      <div data-hm="Step 2: teacher"><span class="n">Paso 2 · Profesor</span><h3>Te asignamos tu profesor</h3><p>Según tu nivel y tu objetivo: entrevista técnica, reuniones o clientes. No elegís solo entre miles.</p></div>
+      <div data-hm="Step 3: progress"><span class="n">Paso 3 · Progreso</span><h3>Ves cómo mejorás</h3><p>La misma respuesta grabada en la semana 1 y en la semana 8, con notas de tu profesor.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="check" data-sec="Speaking test">
+  <div class="wrap sec-line">
+    <h2>Test de 2 minutos</h2>
+    <p class="sub">Elegí la frase que dirías en una entrevista. Son errores que se escuchan mucho en Argentina.</p>
+    <div class="check" id="checkBox" data-hm="Test answers"></div>
+  </div>
+</section>
+
+<section id="book" data-sec="Booking form">
+  <div class="wrap sec-line">
+    <h2>Reservá tu clase de prueba</h2>
+    <p class="sub">25 minutos con un profesor. Te mandamos un recordatorio por WhatsApp y email 24 h y 1 h antes.</p>
+    <form class="book" id="bookForm" novalidate>
+      <div class="row">
+        <label for="fName" data-hm="Field: name">Nombre<input id="fName" name="name" autocomplete="off" placeholder="Ej.: Sofía"></label>
+        <label for="fGoal" data-hm="Field: goal">Tu objetivo
+          <select id="fGoal" name="goal">
+            <option>Entrevista técnica</option><option>Reuniones con clientes</option><option>Trabajo remoto en general</option>
+          </select>
+        </label>
+      </div>
+      <div class="row">
+        <label for="fEmail" data-hm="Field: email">Email<input id="fEmail" name="email" type="email" autocomplete="off" placeholder="nombre@ejemplo.com"></label>
+        <label for="fTime" data-hm="Field: time">Horario preferido
+          <select id="fTime" name="time"><option>Mañana</option><option>Tarde</option><option>Noche</option></select>
+        </label>
+      </div>
+      <button class="btn" type="submit" data-hm="Submit booking">Reservar clase gratis</button>
+      <p class="note">Prototipo: el formulario no envía datos a ningún lado.</p>
+      <div id="bookMsg" role="status" hidden></div>
+    </form>
+  </div>
+</section>
+
+<footer id="foot" data-sec="Footer"><div class="wrap" data-hm="Footer">Prototype for discussion. Prices, durations and copy are examples, not easypeasy's real offer.</div></footer>
+</main>
+
+<aside class="panel" id="panel" hidden aria-label="Tracking layer">
+  <h3>Tracking layer <button type="button" id="closePanel">Close</button></h3>
+
+  <div>
+    <h4>Heatmap</h4>
+    <div class="btnrow" id="modes"></div>
+    <div class="btnrow" style="margin-top:8px">
+      <button type="button" id="sampleBtn">Sample data: off</button>
+      <button type="button" id="resetBtn">Reset my session</button>
+    </div>
+    <div class="legend"><span>low</span><span class="ramp"></span><span>high</span></div>
+    <p class="small" style="margin-top:8px" id="heatNote"></p>
+  </div>
+
+  <div>
+    <h4>What the data says</h4>
+    <ul class="insights" id="insights"></ul>
+  </div>
+
+  <div>
+    <h4>Top clicked elements</h4>
+    <table class="top"><thead><tr><th>Element</th><th class="n">Clicks</th><th class="n">Share</th></tr></thead><tbody id="topBody"></tbody></table>
+    <p class="small" style="margin-top:6px"><span class="flag dead">dead</span> click on something that is not a link or button · <span class="flag rage">rage</span> 3+ fast clicks in the same spot</p>
+  </div>
+
+  <div>
+    <h4>Scroll depth: % of visitors who reached each section</h4>
+    <div class="bars" id="scrollBars"></div>
+    <p class="small" style="margin-top:6px" id="myScroll"></p>
+  </div>
+
+  <div>
+    <h4>Booking form: where people drop</h4>
+    <div class="bars" id="formBars"></div>
+  </div>
+
+  <div>
+    <h4>Traffic source and price test</h4>
+    <div class="btnrow" id="srcs"></div>
+    <p class="small" style="margin-top:8px">Price variant: <b id="varLabel"></b> <button type="button" id="swapVar">Swap</button></p>
+  </div>
+
+  <div>
+    <h4>Funnel, this session</h4>
+    <div class="funnel" id="funnel"></div>
+  </div>
+
+  <div>
+    <h4>Event log</h4>
+    <div class="log" id="log" aria-live="polite"></div>
+  </div>
+
+  <div class="small">In production: Microsoft Clarity for heatmaps and recordings plus analytics events, behind a consent banner and with personal data masked. Sample data is simulated so the views have something to show.</div>
+</aside>
+
+<script>
+(function(){
+  const $=s=>document.querySelector(s);
+  const SOURCES=["organic_tiktok","creator_sofi","meta_retargeting","google_search","company_outreach"];
+  const state={source:SOURCES[0],variant:Math.random()<.5?"A_usd":"B_ars_cuotas",events:[],clicks:[],mode:"off",sample:false,maxScroll:0,fields:{}};
+  const STEPS=[["page_view","Visits"],["check_started","Test started"],["check_completed","Test done"],["trial_form_started","Form started"],["trial_booked","Trial booked"]];
+
+  /* ---------- events ---------- */
+  function track(name,props){
+    const ev={t:new Date().toLocaleTimeString("es-AR",{hour12:false}),name,source:state.source,variant:state.variant,...(props||{})};
+    state.events.push(ev);
+    const p=document.createElement("p");
+    const extra=Object.entries(props||{}).map(([k,v])=>k+"="+v).join(" ");
+    p.append(ev.t+" ");const b=document.createElement("b");b.textContent=name;p.append(b);
+    p.append(" src="+state.source+" var="+state.variant+(extra?" "+extra:""));
+    $("#log").prepend(p);
+    renderFunnel();
+  }
+  const count=n=>state.events.filter(e=>e.name===n).length;
+  function barRow(box,label,val,max,suffix){
+    const row=document.createElement("div");
+    row.innerHTML='<span></span><span class="bar"><i></i></span><span class="num"></span>';
+    row.children[0].textContent=label;row.children[2].textContent=val+(suffix||"");
+    row.querySelector("i").style.width=(max?Math.min(100,val/max*100):0)+"%";box.append(row);
+  }
+  function renderFunnel(){const f=$("#funnel");f.innerHTML="";const top=Math.max(1,count("page_view"));STEPS.forEach(([k,l])=>barRow(f,l,count(k),top))}
+
+  /* ---------- price variant and sources ---------- */
+  function renderPrice(){
+    $("#priceLine").innerHTML=state.variant==="A_usd"
+      ?'Clases 1:1 desde <b>USD 11 por clase</b>. Sin contrato anual.<span class="tag">ejemplo</span>'
+      :'Clases 1:1 desde <b>$16.000 por clase</b>, en 3 cuotas sin interés.<span class="tag">ejemplo</span>';
+    $("#varLabel").textContent=state.variant;
+  }
+  function renderSources(){
+    const box=$("#srcs");box.innerHTML="";
+    SOURCES.forEach(s=>{const b=document.createElement("button");b.type="button";b.textContent=s;if(s===state.source)b.className="on";
+      b.onclick=()=>{state.source=s;renderSources();track("page_view",{landing:"/interview"})};box.append(b)});
+  }
+
+  /* ---------- speaking test (correct answer position varies) ---------- */
+  const QS=[
+    {ctx:"Te preguntan tu edad.",q:"Which one sounds natural?",o:["I have 23 years.","I'm 23 years old."],a:1,why:"En inglés la edad va con \"to be\": I'm 23."},
+    {ctx:"Contás dónde vivís.",q:"Which one is correct?",o:["I live in Buenos Aires.","I am live in Buenos Aires."],a:0,why:"\"Live\" ya es el verbo; no lleva \"am\"."},
+    {ctx:"No escuchaste la pregunta del entrevistador.",q:"What do you say?",o:["Could you repeat me?","Sorry, could you repeat that?"],a:1,why:"Se repite la pregunta (that), no a vos (me)."},
+    {ctx:"Estás de acuerdo con una idea.",q:"Which one is correct?",o:["I agree.","I am agree."],a:0,why:"\"Agree\" es verbo: I agree."},
+    {ctx:"Te preguntan: Why do you want this job?",q:"Which answer is stronger?",o:["Because I need a job and the salary is good.","Because I like building products for real users, and your team ships fast."],a:1,why:"La segunda conecta tu motivación con la empresa."}
+  ];
+  let qi=0,score=0,started=false;
+  function renderQ(){
+    const box=$("#checkBox");box.innerHTML="";
+    const pr=document.createElement("div");pr.className="progress";pr.setAttribute("aria-hidden","true");pr.innerHTML="<i></i>";pr.firstChild.style.width=(qi/QS.length*100)+"%";box.append(pr);
+    if(qi>=QS.length)return renderResult(box);
+    const Q=QS[qi];
+    const c=document.createElement("p");c.className="qctx";c.textContent="Pregunta "+(qi+1)+" de "+QS.length+" · "+Q.ctx;
+    const h=document.createElement("p");h.className="q";h.textContent=Q.q;
+    const opts=document.createElement("div");opts.className="opts";
+    const fb=document.createElement("p");fb.className="fb";fb.setAttribute("aria-live","polite");
+    Q.o.forEach((txt,i)=>{const b=document.createElement("button");b.type="button";b.className="opt";b.textContent=txt;
+      b.onclick=()=>{
+        if(!started){started=true;track("check_started")}
+        [...opts.children].forEach((x,j)=>{x.disabled=true;if(j===Q.a)x.classList.add("right");else if(j===i)x.classList.add("wrong")});
+        const right=i===Q.a;if(right)score++;
+        fb.textContent=(right?"Bien. ":"Casi. ")+Q.why;
+        track("question_answered",{q:qi+1,correct:right});
+        setTimeout(()=>{qi++;renderQ()},1400);
+      };opts.append(b)});
+    box.append(c,h,opts,fb);
+  }
+  function renderResult(box){
+    track("check_completed",{score:score+"/"+QS.length});
+    const lvl=score>=5?"Listo para practicar entrevistas reales":score>=3?"Entendés bien; te falta soltura al hablar":"Conviene empezar por las frases base";
+    const r=document.createElement("div");r.className="result";
+    r.innerHTML='<p class="eyebrow">Tu resultado</p><p class="score"></p><h3></h3><p class="qctx">Esto es una muestra. El test real usa tu voz y lo revisa un profesor, que arma tu primera clase con este resultado.</p><div class="ctas"><a class="btn" href="#book" data-hm="Result: book trial">Reservar clase de prueba</a><button type="button" class="btn ghost" id="again" data-hm="Result: repeat test">Repetir test</button></div>';
+    r.querySelector(".score").textContent=score+"/"+QS.length;
+    r.querySelector("h3").textContent=lvl;
+    box.append(r);
+    r.querySelector("a").addEventListener("click",()=>track("result_cta_clicked"));
+    r.querySelector("#again").onclick=()=>{qi=0;score=0;started=false;renderQ()};
+  }
+
+  /* ---------- booking form ---------- */
+  let formStarted=false;
+  ["fName","fGoal","fEmail","fTime"].forEach(id=>$("#"+id).addEventListener("focus",()=>{
+    if(!state.fields[id]){state.fields[id]=true;track("form_field_focus",{field:id})}
+    if(!formStarted){formStarted=true;track("trial_form_started")}
+  }));
+  $("#bookForm").addEventListener("submit",e=>{
+    e.preventDefault();
+    const msg=$("#bookMsg");msg.hidden=false;
+    const name=$("#fName").value.trim(),email=$("#fEmail").value.trim();
+    if(!name||!/^\S+@\S+\.\S+$/.test(email)){
+      msg.className="err";msg.textContent=!name?"Escribí tu nombre para reservar.":"Revisá el email: falta la @ o el dominio.";
+      track("form_error",{field:!name?"name":"email"});return;
+    }
+    msg.className="ok";
+    msg.textContent="Listo, "+name+" (demo). En el producto real acá se agenda la clase con un profesor para "+$("#fGoal").value.toLowerCase()+" y salen los recordatorios 24 h y 1 h antes.";
+    track("trial_booked",{goal:$("#fGoal").value,time:$("#fTime").value});
+  });
+  document.querySelectorAll("[data-ev]").forEach(a=>a.addEventListener("click",()=>track(a.dataset.ev)));
+
+  /* ---------- seeded random for stable sample data ---------- */
+  function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+
+  /* Sample: 400 simulated visits. Clicks are stored relative to elements so they stay put on resize. */
+  const SAMPLE_VISITS=400;
+  const SAMPLE_CLICKS=[
+    ["CTA: take the test",138],["Test answers",164],["Price line",72],["CTA: book trial",54],["Step 2: teacher",41],
+    ["Field: name",46],["Field: email",39],["Field: goal",31],["Field: time",27],["Submit booking",26],
+    ["Headline",22],["Step 1: test",15],["Intro text",11],["Step 3: progress",9],["Footer",4]
+  ];
+  const SAMPLE_RAGE={"Price line":9,"Submit booking":3};
+  const SAMPLE_SCROLL={"Hero":100,"How it works":78,"Speaking test":56,"Booking form":31,"Footer":19};
+  const SAMPLE_FORM=[["Saw the form",124],["Focused name",46],["Focused email",39],["Picked a time",27],["Submitted",26]];
+  let sampleClicks=[];
+  function buildSample(){
+    const r=rng(42);sampleClicks=[];
+    SAMPLE_CLICKS.forEach(([label,n])=>{
+      for(let i=0;i<n;i++){
+        // cluster near the element's visual center with some spread
+        const fx=Math.min(.98,Math.max(.02,.5+(r()+r()+r()-1.5)*.45));
+        const fy=Math.min(.98,Math.max(.02,.5+(r()+r()+r()-1.5)*.45));
+        sampleClicks.push({label,fx,fy,interactive:isInteractiveLabel(label),rage:false});
+      }
+    });
+    Object.entries(SAMPLE_RAGE).forEach(([label,n])=>{for(let i=0;i<n;i++)sampleClicks.push({label,fx:.3+r()*.4,fy:.5,interactive:isInteractiveLabel(label),rage:true})});
+  }
+  function isInteractiveLabel(l){return /^(CTA|Field|Submit|Result|Test answers|Tracking)/.test(l)}
+
+  /* ---------- real clicks ---------- */
+  let lastClicks=[];
+  document.addEventListener("click",e=>{
+    if(e.target.closest(".panel"))return;
+    const host=e.target.closest("[data-hm]")||e.target.closest("[data-sec]");
+    if(!host)return;
+    const label=host.dataset.hm||(host.dataset.sec+" (empty area)");
+    const rc=host.getBoundingClientRect();
+    const fx=rc.width?(e.clientX-rc.left)/rc.width:.5,fy=rc.height?(e.clientY-rc.top)/rc.height:.5;
+    const interactive=!!e.target.closest("a,button,input,select,label");
+    const now=performance.now();
+    lastClicks=lastClicks.filter(c=>now-c.t<800);
+    lastClicks.push({t:now,x:e.clientX,y:e.clientY});
+    const near=lastClicks.filter(c=>Math.hypot(c.x-e.clientX,c.y-e.clientY)<30).length;
+    const rage=near>=3;
+    state.clicks.push({label,fx,fy,interactive,rage,host});
+    if(rage)track("rage_click",{element:label});
+    else if(!interactive)track("dead_click",{element:label});
+    drawHeat();renderAnalytics();
+  });
+
+  /* ---------- scroll depth (real) ---------- */
+  function secReach(){
+    const out={};document.querySelectorAll("[data-sec]").forEach(s=>{
+      const top=s.getBoundingClientRect().top+scrollY;out[s.dataset.sec]=state.maxScroll>=top+40});return out;
+  }
+  window.addEventListener("scroll",()=>{
+    const bottom=scrollY+innerHeight;if(bottom>state.maxScroll){state.maxScroll=bottom;renderScroll();if(state.mode==="scroll")drawHeat()}
+  },{passive:true});
+
+  /* ---------- heatmap drawing ---------- */
+  const cv=$("#heat"),ctx=cv.getContext("2d");
+  const off=document.createElement("canvas"),octx=off.getContext("2d");
+  const page=$("#page");
+  function sizeCanvas(){
+    cv.width=0;cv.height=0;
+    const w=document.documentElement.clientWidth,h=page.offsetTop+page.offsetHeight;
+    cv.width=w;cv.height=h;cv.style.width=w+"px";cv.style.height=h+"px";
+    drawHeat();
+  }
+  function hostFor(label){return document.querySelector('[data-hm="'+label.replace(/"/g,'\\"')+'"]')}
+  function absPoint(c){
+    const el=c.host&&c.host.isConnected?c.host:hostFor(c.label);if(!el)return null;
+    const rc=el.getBoundingClientRect();if(!rc.width&&!rc.height)return null;
+    return [rc.left+scrollX+c.fx*rc.width, rc.top+scrollY+c.fy*rc.height];
+  }
+  // blue -> teal -> yellow -> red ramp
+  const RAMP=[[43,108,255],[34,198,163],[255,210,63],[255,90,54]];
+  function rampColor(t){const s=t*(RAMP.length-1),i=Math.min(RAMP.length-2,Math.floor(s)),f=s-i;return RAMP[i].map((v,k)=>Math.round(v+(RAMP[i+1][k]-v)*f))}
+  function drawClicks(){
+    const pts=(state.sample?sampleClicks:[]).concat(state.clicks).map(absPoint).filter(Boolean);
+    if(!pts.length)return;
+    off.width=cv.width;off.height=cv.height;
+    const rad=28,a=Math.max(.06,Math.min(.35,6/Math.sqrt(pts.length)));
+    pts.forEach(([x,y])=>{const g=octx.createRadialGradient(x,y,0,x,y,rad);g.addColorStop(0,"rgba(0,0,0,"+a+")");g.addColorStop(1,"rgba(0,0,0,0)");octx.fillStyle=g;octx.fillRect(x-rad,y-rad,rad*2,rad*2)});
+    const img=octx.getImageData(0,0,off.width,off.height),d=img.data;
+    let max=0;for(let i=3;i<d.length;i+=4)if(d[i]>max)max=d[i];
+    if(!max)return;
+    for(let i=0;i<d.length;i+=4){const v=d[i+3];if(!v)continue;const t=v/max,[r,g,b]=rampColor(t);d[i]=r;d[i+1]=g;d[i+2]=b;d[i+3]=Math.round(90+150*t)}
+    ctx.putImageData(img,0,0);
+  }
+  function scrollData(){
+    if(state.sample)return SAMPLE_SCROLL;
+    const reach=secReach(),o={};Object.keys(reach).forEach(k=>o[k]=reach[k]?100:0);return o;
+  }
+  function drawScroll(){
+    const data=scrollData();
+    const secs=[...document.querySelectorAll("[data-sec]")];
+    secs.forEach(s=>{
+      const top=s.getBoundingClientRect().top+scrollY,h=s.offsetHeight,pct=data[s.dataset.sec]??0;
+      const [r,g,b]=rampColor(pct/100);
+      ctx.fillStyle="rgba("+r+","+g+","+b+",.28)";ctx.fillRect(0,top,cv.width,h);
+      ctx.fillStyle="rgba("+r+","+g+","+b+",.9)";ctx.fillRect(0,top,cv.width,3);
+      const txt=pct+"% of visitors reached "+s.dataset.sec;
+      ctx.font="600 13px "+getComputedStyle(document.body).getPropertyValue("--mono");
+      const w=ctx.measureText(txt).width+16;
+      ctx.fillStyle="rgba(15,23,41,.9)";ctx.fillRect(12,top+8,w,24);
+      ctx.fillStyle="#ffffff";ctx.fillText(txt,20,top+25);
+    });
+  }
+  function drawHeat(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    if(state.mode==="clicks")drawClicks();
+    else if(state.mode==="scroll")drawScroll();
+  }
+
+  /* ---------- analytics panel ---------- */
+  function allClicks(){return (state.sample?sampleClicks:[]).concat(state.clicks)}
+  function renderTop(){
+    const cs=allClicks(),tb=$("#topBody");tb.innerHTML="";
+    if(!cs.length){tb.innerHTML='<tr><td colspan="3">No clicks yet. Click around the page or turn on sample data.</td></tr>';return []}
+    const agg={};cs.forEach(c=>{const a=agg[c.label]||(agg[c.label]={n:0,dead:!c.interactive,rage:0});a.n++;if(c.rage)a.rage++;if(c.interactive)a.dead=false});
+    const rows=Object.entries(agg).sort((x,y)=>y[1].n-x[1].n);
+    rows.slice(0,10).forEach(([label,a])=>{
+      const tr=document.createElement("tr");
+      const td=document.createElement("td");td.textContent=label;
+      if(a.dead){const s=document.createElement("span");s.className="flag dead";s.textContent="dead";td.append(s)}
+      if(a.rage){const s=document.createElement("span");s.className="flag rage";s.textContent="rage ×"+a.rage;td.append(s)}
+      const n=document.createElement("td");n.className="n";n.textContent=a.n;
+      const p=document.createElement("td");p.className="n";p.textContent=Math.round(a.n/cs.length*100)+"%";
+      tr.append(td,n,p);tb.append(tr);
+    });
+    return rows;
+  }
+  function renderScroll(){
+    const box=$("#scrollBars");box.innerHTML="";const d=scrollData();
+    Object.entries(d).forEach(([k,v])=>barRow(box,k,v,100,"%"));
+    const docH=page.offsetTop+page.offsetHeight;
+    $("#myScroll").textContent="Your session reached "+Math.min(100,Math.round(state.maxScroll/docH*100))+"% of the page."+(state.sample?" Bars show the 400 simulated visits.":"");
+  }
+  function renderForm(){
+    const box=$("#formBars");box.innerHTML="";
+    if(state.sample){SAMPLE_FORM.forEach(([k,v])=>barRow(box,k,v,SAMPLE_FORM[0][1]));return}
+    const reach=secReach()["Booking form"]?1:0;
+    const rows=[["Saw the form",reach],["Focused name",state.fields.fName?1:0],["Focused email",state.fields.fEmail?1:0],["Picked a time",state.fields.fTime?1:0],["Submitted",count("trial_booked")?1:0]];
+    rows.forEach(([k,v])=>barRow(box,k,v,1));
+  }
+  const ADVICE={
+    "Price line":"Visitors click the price, which is not a link. They want plan details: add a pricing section or a \"Ver planes\" link.",
+    "Step 2: teacher":"Visitors click \"Te asignamos tu profesor\". Show real teacher profiles there.",
+    "Headline":"Some clicks on the headline. Normal, low priority.",
+    "Step 1: test":"People click the test step. Make it a link to the test.",
+    "Intro text":"Clicks on the intro text. Low priority."
+  };
+  function renderInsights(rows){
+    const ul=$("#insights");ul.innerHTML="";const add=t=>{const li=document.createElement("li");li.textContent=t;ul.append(li)};
+    const cs=allClicks();
+    if(!cs.length&&!state.sample){add("Turn on sample data to see what 400 visits would reveal, or click around the page to build your own map.");return}
+    const dead=rows.filter(([,a])=>a.dead);
+    if(dead.length){const [l,a]=dead[0];add(Math.round(a.n/cs.length*100)+"% of clicks hit \""+l+"\", which does nothing. "+(ADVICE[l]||"Make it clickable or remove the cue."))}
+    const rage=rows.filter(([,a])=>a.rage).sort((x,y)=>y[1].rage-x[1].rage);
+    if(rage.length)add("Rage clicks on \""+rage[0][0]+"\" ("+rage[0][1].rage+"). Visitors expect something to happen there.");
+    const sc=scrollData();
+    if(state.sample){
+      add("Only "+sc["Booking form"]+"% of visitors scroll to the booking form. Keep the booking button on the test result and test a sticky button on mobile.");
+      add("Form: "+SAMPLE_FORM[1][1]+" people start it and "+SAMPLE_FORM[4][1]+" submit ("+Math.round(SAMPLE_FORM[4][1]/SAMPLE_FORM[1][1]*100)+"%). Most of the drop is between name and email: test asking for WhatsApp instead of email.");
+      const testShare=Math.round(SAMPLE_CLICKS[0][1]/(SAMPLE_CLICKS[0][1]+SAMPLE_CLICKS[3][1])*100);
+      add(testShare+"% of hero CTA clicks go to the test, not the trial. The test is the better first step; keep it as the main button.");
+    }
+  }
+  function renderAnalytics(){const rows=renderTop();renderInsights(rows);renderScroll();renderForm()}
+
+  /* ---------- controls ---------- */
+  const MODES=[["off","Map: off"],["clicks","Click map"],["scroll","Scroll map"]];
+  function renderModes(){
+    const box=$("#modes");box.innerHTML="";
+    MODES.forEach(([m,l])=>{const b=document.createElement("button");b.type="button";b.textContent=l;if(m===state.mode)b.className="on";
+      b.onclick=()=>{state.mode=m;renderModes();drawHeat()};box.append(b)});
+    $("#heatNote").textContent=state.mode==="clicks"?"Red is where most clicks land; blue is where few do.":state.mode==="scroll"?"Each section shows the share of visitors who scrolled to it.":"Pick a map to draw it over the page.";
+  }
+  $("#openPanel").onclick=()=>{$("#panel").hidden=false;$("#closePanel").focus()};
+  $("#closePanel").onclick=()=>{$("#panel").hidden=true;$("#openPanel").focus()};
+  $("#sampleBtn").onclick=e=>{
+    state.sample=!state.sample;if(state.sample&&!sampleClicks.length)buildSample();
+    e.target.textContent="Sample data: "+(state.sample?"on (400 visits)":"off");e.target.classList.toggle("on",state.sample);
+    if(state.sample&&state.mode==="off")state.mode="clicks";
+    renderModes();drawHeat();renderAnalytics();
+  };
+  $("#swapVar").onclick=()=>{state.variant=state.variant==="A_usd"?"B_ars_cuotas":"A_usd";renderPrice();track("variant_assigned",{price:state.variant})};
+  $("#resetBtn").onclick=()=>{state.events=[];state.clicks=[];state.fields={};state.maxScroll=scrollY+innerHeight;$("#log").innerHTML="";drawHeat();renderAnalytics();track("page_view",{landing:"/interview"})};
+
+  window.addEventListener("resize",sizeCanvas);
+  new ResizeObserver(()=>sizeCanvas()).observe(page);
+
+  state.maxScroll=scrollY+innerHeight;
+  renderSources();renderPrice();renderQ();renderModes();sizeCanvas();renderAnalytics();
+  track("page_view",{landing:"/interview"});
+})();
+</script>
+
+</body></html>
